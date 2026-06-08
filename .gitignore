@@ -53,3 +53,30 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# ===== Project build output (from Makefile) =====
+build/
+bin/
+game            # your PROJECT_NAME binary if SRC_DIR := .
+
+# ===== raylib (only if cloned inside the repo) =====
+# raylib/
+
+# ===== Valgrind / core dumps =====
+core
+vgcore.*
+
+# ===== Editor / IDE =====
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/c_cpp_properties.json
+.idea/
+*.swp
+*.swo
+*~
+
+# ===== OS junk (WSL touches both Linux + Windows fs) =====
+.DS_Store
+Thumbs.db
+desktop.ini
