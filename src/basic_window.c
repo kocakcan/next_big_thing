@@ -11,6 +11,7 @@ int main(void) {
 	while (!WindowShouldClose()) {
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
+		DrawFPS(10, 10);
 		DrawText("This is my first window, wow!", 
 				140, (SCREEN_HEIGHT / 2) - FONT_SIZE / 2, FONT_SIZE, LIGHTGRAY);
 		EndDrawing();

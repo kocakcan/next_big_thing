@@ -1,36 +1,42 @@
-PROJECT_NAME := game
-SRC_DIR      := src
-BUILD_DIR    := build
-SRCS         := $(wildcard $(SRC_DIR)/*.c)
-OBJS         := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
-DEPS         := $(OBJS:.o=.d)
+# ===== raylib Makefile: one binary per .c file (great for examples) =====
+# Usage:
+#   make                 -> build ALL examples in src/
+#   make build/core_basic_window   -> build just that one
+#   make run NAME=core_basic_window -> build + run just that one
+#   make list            -> list available examples
+#   make clean           -> remove build/
+
+SRC_DIR   := src
+BUILD_DIR := build
 
 CC      := gcc
 CFLAGS  := -std=c99 -Wall -Wextra -g -O0 -I. -MMD -MP
-LDFLAGS :=
 LDLIBS  := -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
-TARGET := $(BUILD_DIR)/$(PROJECT_NAME)
+SRCS    := $(wildcard $(SRC_DIR)/*.c)
+BINS    := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%,$(SRCS))
+DEPS    := $(BINS:=.d)
 
-.PHONY: all run release clean
+.PHONY: all run list clean
 
-all: $(TARGET)
+all: $(BINS)
 
-$(TARGET): $(OBJS)
-	$(CC) $(OBJS) -o $@ $(LDFLAGS) $(LDLIBS)
-	@echo ">> Built $(TARGET)"
-
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+# Build each source file into its own executable
+$(BUILD_DIR)/%: $(SRC_DIR)/%.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $< -o $@ $(LDLIBS)
+	@echo ">> Built $@"
 
 $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
 
-run: all
-	./$(TARGET)
+# Build + run a single example:  make run NAME=core_basic_window
+run: $(BUILD_DIR)/$(NAME)
+	@./$(BUILD_DIR)/$(NAME)
 
-release: CFLAGS := -std=c99 -Wall -O2 -DNDEBUG -I.
-release: clean all
+# Show all examples you can build/run
+list:
+	@echo "Available examples:"
+	@ls -1 $(SRC_DIR)/*.c 2>/dev/null | sed 's|$(SRC_DIR)/||; s|\.c$$||' | sed 's|^|  - |'
 
 clean:
 	@rm -rf $(BUILD_DIR)
