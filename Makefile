@@ -5,13 +5,27 @@
 #   make run NAME=core_basic_window -> build + run just that one
 #   make list            -> list available examples
 #   make clean           -> remove build/
-
 SRC_DIR   := src
 BUILD_DIR := build
 
-CC      := gcc
+UNAME_S := $(shell uname -s)
+
 CFLAGS  := -std=c99 -Wall -Wextra -g -O0 -I. -MMD -MP
-LDLIBS  := -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+
+ifeq ($(UNAME_S),Darwin)
+    CC      := clang
+    UNAME_M := $(shell uname -m)
+    ifeq ($(UNAME_M),arm64)
+        BREW_PREFIX := /opt/homebrew
+    else
+        BREW_PREFIX := /usr/local
+    endif
+    CFLAGS  += -I$(BREW_PREFIX)/include
+    LDLIBS  := -L$(BREW_PREFIX)/lib -lraylib -framework CoreVideo -framework IOKit -framework Cocoa -framework GLUT -framework OpenGL
+else
+    CC      := gcc
+    LDLIBS  := -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+endif
 
 SRCS    := $(wildcard $(SRC_DIR)/*.c)
 BINS    := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%,$(SRCS))
