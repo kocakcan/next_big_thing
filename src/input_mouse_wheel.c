@@ -11,6 +11,9 @@ int main(void) {
 
 	while (!WindowShouldClose()) {
 		boxPositionY -= (int)(GetMouseWheelMove() * SCROLL_SPEED);
+		if (boxPositionY + 80 < 0 ||
+		    boxPositionY - 40 > SCREEN_HEIGHT)
+			boxPositionY = SCREEN_HEIGHT / 2;
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 		DrawRectangle(SCREEN_WIDTH / 2 - 40, boxPositionY,
