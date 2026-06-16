@@ -4,6 +4,8 @@
 #define MAX_BUILDINGS	100
 #define SCREEN_WIDTH	800
 #define SCREEN_HEIGHT	450
+#define BASE_SPEED	2.0f
+#define ROT_FACTOR	2.84f	// how tilting affects speed
 
 int main(void) {
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "2D Camera");
@@ -32,8 +34,18 @@ int main(void) {
 	SetTargetFPS(60);
 
 	while (!WindowShouldClose()) {
-		if (IsKeyDown(KEY_RIGHT)) player.x += 2;
-		else if (IsKeyDown(KEY_LEFT)) player.x -= 2;
+		float speed = 0.0f;
+		if (IsKeyDown(KEY_RIGHT)) {
+			speed = BASE_SPEED + camera.rotation * ROT_FACTOR;
+			// if (speed < 0.2f)
+				// speed = 0.2f;
+			player.x += speed;
+		} else if (IsKeyDown(KEY_LEFT)) {
+			speed = BASE_SPEED - camera.rotation * ROT_FACTOR;
+			// if (speed < 0.2f)
+				// speed = 0.2f;
+			player.x -= speed;
+		}
 
 		// camera target follows player
 		camera.target = (Vector2){ player.x + 20, player.y + 20 };
@@ -55,6 +67,7 @@ int main(void) {
 		DrawRectangle(-6000, 320, 13000, 8000, DARKGRAY);
 		for (int i = 0; i < MAX_BUILDINGS; ++i)
 			DrawRectangleRec(buildings[i], buildColors[i]);
+		DrawRectangleRec(player, RED);
 		DrawLine((int)camera.target.x, -SCREEN_HEIGHT * 10, (int)camera.target.x,
 				SCREEN_HEIGHT * 10, GREEN);
 		DrawLine(-SCREEN_WIDTH * 10, (int)camera.target.y, SCREEN_WIDTH * 10, 
@@ -72,6 +85,7 @@ int main(void) {
 		DrawText("- Mouse Wheel to Zoom in-out", 40, 60, 10, DARKGRAY);
 		DrawText("- A / S to Rotate", 40, 80, 10, DARKGRAY);
 		DrawText("- R to reset Zoom and Rotation", 40, 100, 10, DARKGRAY);
+		DrawText(TextFormat("Current speed: %.2f p/s", speed), 640, 30, 10, RED);
 		EndDrawing();
 	}
 	CloseWindow();
